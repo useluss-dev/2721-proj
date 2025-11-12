@@ -10,13 +10,13 @@ slen:
     push    ebx 			; save ebx register on the stack
     mov     ebx, eax 		; copy eax into ebx
 
-nextchar:
+nextchar: 					; this is a label for the function to jump to
     cmp     byte [eax], 0 	; checks if byte pointed to by eax is the null terminator
-    jz      finished		; jump if eax is 0
+    jz      finished		; jump if eax is 0 (jz stands for jump if 0)
     inc     eax				; increment eax by 1
     jmp     nextchar		; jumps back to the top of nextchar
  
-finished:
+finished:					; this is a label for the function to jump to
     sub     eax, ebx		; subtract start address from current address
     pop     ebx				; restore ebx to value at start
     ret						; return
