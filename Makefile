@@ -1,7 +1,7 @@
 ASM := nasm
 LD := ld
 OUTPUT := out
-SRC := main.asm
+SRC := main.asm functions.asm
 OBJ := $(SRC:.asm=.o)
 
 ASMFLAGS := -f elf
