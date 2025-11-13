@@ -1,6 +1,8 @@
+%define STDIN 0
 %define STDOUT 1
 %define SYS_EXIT 1
 %define SYS_WRITE 4
+%define SYS_READ 3
 %define EXIT_OK 0
 
 ;------------------------------------------
@@ -43,6 +45,27 @@ sprint:
     pop     ecx				; remove ecx from the stack
     pop     edx				; remove edx from the stack
     ret						; return
+
+;------------------------------------------
+; void sread(String input, int input_size)
+; String reading function
+sread:
+	push	eax
+	push	ebx
+	push	ecx
+	push	edx
+
+	mov		ecx, eax
+	mov		edx, ebx
+	mov		ebx, STDIN
+	mov		eax, SYS_READ
+	int 	80h
+
+	pop		eax
+	pop		ebx
+	pop		ecx
+	pop		edx
+	ret
 
 ;------------------------------------------
 ; void exit()
