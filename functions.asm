@@ -7,7 +7,7 @@
 ; int slen(String message)
 ; String length calculation function
 slen:
-    push    ebx 			; save ebx register on the stack
+    push    ebx 			; put ebx on the stack
     mov     ebx, eax 		; copy eax into ebx
 
 nextchar: 					; this is a label for the function to jump to
@@ -25,11 +25,10 @@ finished:					; this is a label for the function to jump to
 ; void sprint(String message)
 ; String printing function
 sprint:
-	; save registers on the stack
-    push    edx
-    push    ecx
-    push    ebx
-    push    eax
+    push    edx				; put edx on the stack
+    push    ecx				; put ecx on the stack
+    push    ebx				; put ebx on the stack
+    push    eax				; put eax on the stack
     call    slen 			; call slen
  
     mov     edx, eax 		; move the string length from eax into edx 
@@ -38,12 +37,11 @@ sprint:
     mov     ecx, eax		; set ecx to eax which is the value of the string
     mov     ebx, STDOUT		; set ebx to 1 (stdout file)
     mov     eax, SYS_WRITE	; set eax to the write syscall opcode
-    int     80h				; software interrupt to move to kernal mode to execute syscall
+    int     80h 			; software interrupt to move to kernal mode to execute syscall
  
- 	; restore registers to their value before function call
-    pop     ebx
-    pop     ecx
-    pop     edx
+    pop     ebx				; remove ebx from the stack
+    pop     ecx				; remove ecx from the stack
+    pop     edx				; remove edx from the stack
     ret						; return
 
 ;------------------------------------------
@@ -52,5 +50,5 @@ sprint:
 quit:
     mov     ebx, EXIT_OK	; set ebx to the exit ok status
     mov     eax, SYS_EXIT	; set eax to the exit syscall opcode
-    int     80h
-    ret
+    int     80h				; software interrupt to move to kernal mode to execute syscall
+    ret						; return

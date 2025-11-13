@@ -7,9 +7,9 @@ SECTION .text
 global  _start
  
 _start:
-	; print msg
-    mov     eax, msg	; move memory address of our message into eax
+; print msg
+    mov     eax, msg	; copy msg to eax
 	call	sprint		; call our string printing function
  
- 	; end program
+; end program
  	call	quit		; call our function to quit the program
