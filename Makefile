@@ -21,4 +21,4 @@ clean:
 run: $(OUTPUT)
 	./$(OUTPUT)
 
-.PHONY: all clean
+.PHONY: all clean run

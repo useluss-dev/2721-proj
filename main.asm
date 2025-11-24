@@ -1,30 +1,102 @@
 %include	'functions.asm'		; include our functions file
 
-%define		INPUT_SIZE		255		; max size of user input
-%define		STDIN			0		; stdin file descriptor
-%define		READ			3		; read opcode
+SECTION .data
+flag_create	db "--create", 0
+flag_delete db "--delete", 0
+flag_help	db "--help", 0
 
-SECTION .data										; this section denotes where we create variables
-msg		db		'Enter CREATE or DELETE: ', 0Ah		; this assigns the value in '' along with a null terminator `0Ah` into the msg1 variable
+err_no_flag db "Error: You are missing required flags.", 0
+err_wrong_args db "Error: Wrong number of arguments for this flag", 0
+usage_msg db "Usage:", 10, \
+           "  program --help", 10, \
+           "      Show this help message.", 10, \
+           "  program --create <name>", 10, \
+           "      Create a file with the given name.", 10, \
+           "  program --delete <name>", 10, \
+           "      Delete the file with the given name.", 10, \
+           0
 
-SECTION .bss						; this section denotes where we can reserver blocks of memory to store uninitialized variables
-usrinput:		resb	INPUT_SIZE 	; this reservers of a block of 255 bytes for user input
- 
-SECTION .text		; this section denotes where actual executable code will go
-global  _start		; this denotes that this is where our program starts
- 
+SECTION .text
+global _start
+
 _start:
-; print msg
-    mov     eax, msg	; copy msg to eax
-	call	sprint		; call our string printing function
+    mov     eax, [esp]        ; argc
+    lea     ebx, [esp+4]      ; argv pointer = &argv[0]
 
-; read user input
-	mov		eax, usrinput
-	mov		ebx, INPUT_SIZE
-	call	sread
+    add     ebx, 4			  ; move to argv[1] (skip program name arg)
+    dec     eax               ; argc--
 
-	mov		eax, usrinput
-	call 	sprint
+; Checks the first argumet after program name to see if it's a flag.
+check_flag:
+    cmp     eax, 0			  ; check if there are any arugments
+    jz      no_valid_flags	  ; if no args are provided
 
-; end program
- 	call	quit		; call our function to quit the program
+    ; load current argument pointer:
+    ; ebx points to argv array, so [ebx] = argv[i]
+    mov     esi, [ebx]
+    cmp     esi, 0
+    jz      no_valid_flags
+
+    ; compare current argument with the "--create" flag
+    push    flag_create
+    push    esi
+    call    strcmp
+    add     esp, 8
+    test    eax, eax
+    jz      handle_create
+
+    ; compare current argument with the "--delete" flag
+    push    flag_delete
+    push    esi
+    call    strcmp
+    add     esp, 8
+    test    eax, eax
+    jz      handle_delete
+
+    ; compare current argument with the "--help" flag
+    push    flag_help
+    push    esi
+    call    strcmp
+    add     esp, 8
+    test    eax, eax
+    jz      handle_help
+
+    ; if we reach this point the argument did not match any known flag.
+	jmp 	no_valid_flags
+
+; Error handling
+no_valid_flags:
+	mov		eax, err_no_flag
+	call	sprintLF
+	jmp 	show_usage
+
+wrong_arg_count:
+	mov		eax, err_wrong_args
+	call	sprintLF
+	jmp		show_usage
+
+; flag handlers
+handle_create:
+	mov		edx, [esp]
+	cmp		edx, 3	
+	jne 	wrong_arg_count
+
+	; TODO: implement creating file here
+	jmp		quit
+
+handle_delete:
+	mov 	edx, [esp]
+	cmp		edx, 3
+	jne		wrong_arg_count
+
+	; TODO: implement deleting file here
+	jmp		quit
+
+handle_help:
+	jmp		show_usage
+
+; print how to use the program
+show_usage:
+	mov		eax, usage_msg
+	call	sprintLF
+	jmp		quit
