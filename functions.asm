@@ -135,6 +135,37 @@ strcmp:
     ret		                ; return to caller
 
 ;------------------------------------------
+; void file_exists(string filename)
+; check if a file exists
+file_exists:
+    push    ebp                 ; save old base pointer on the stack
+    mov     ebp, esp            ; set current stack pointer as new base pointer
+
+    mov     ebx, [ebp+8]        ; go to the memory location (ebp+8) and fetch the filename pointer argument
+    mov     eax, 5              ; load syscall number 5 (sys_open) into eax
+    mov     ecx, 0              ; use flags = 0 → open file in read-only mode
+    mov     edx, 0              ; no mode bits needed because read-only never creates a file
+    int     80h                 ; ask the kernel to open the file
+
+    cmp     eax, 0              ; compare return value with zero
+    jl      .does_not_exist     ; if eax < 0, the open failed → file does not exist
+
+    mov     ebx, eax            ; file opened successfully, move file descriptor into ebx
+    mov     eax, 6              ; syscall number 6 → sys_close
+    int     80h                 ; close the file descriptor
+
+    mov     eax, 1              ; return value 1 → file exists
+    jmp     .done               ; skip the non-existent case
+
+.does_not_exist:
+    mov     eax, 0              ; return value 0 → file does not exist
+
+.done:
+    mov     esp, ebp            ; restore old stack pointer
+    pop     ebp                 ; restore old base pointer
+    ret                         ; return to caller
+
+;------------------------------------------
 ; void quit()
 ; exit program and restore resources
 quit:
