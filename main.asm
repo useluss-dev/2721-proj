@@ -76,12 +76,51 @@ wrong_arg_count:
 	jmp		show_usage
 
 ; flag handlers
+file_exists:
+    push    ebp
+    mov     ebp, esp
+
+    mov     ebx, [ebp+8]
+    mov     eax, 5
+    mov     ecx, 0
+    mov     edx, 0
+    int     80h
+
+    cmp     eax, 0
+    jl      .does_not_exist
+
+    mov     ebx, eax
+    mov     eax, 6
+    int     80h
+
+    mov     eax, 1
+    jmp     .done
+
+.does_not_exist:
+    mov     eax, 0
+
+.done:
+    mov     esp,ebp
+    pop     ebp
+    ret 
+
 handle_create:
 	mov		edx, [esp]
 	cmp		edx, 3	
 	jne 	wrong_arg_count
 
-	; TODO: implement creating file here
+    mov     esi, [ebx+4] ;filename = argv[2]
+
+    push    esi
+    call    file_exists
+    add     esp,4
+
+    cmp     eax, 1
+    mov     eax, 8
+    mov     ebx, esi
+    mov     ecx, 0777o
+    int     80h
+
 	jmp		quit
 
 handle_delete:
