@@ -89,12 +89,24 @@ handle_create:
     call 	quit                ; leave the program
 
 handle_delete:
-	mov 	edx, [esp]
-	cmp		edx, 3
-	jne		wrong_arg_count
+	mov 	edx, [esp]          ; get how many arguments the user typed
+	cmp		edx, 3              ; requires 3 arguments: program, flag, filename
+	jne		wrong_arg_count     ; if not 3, jump to error handler
 
-	; TODO: implement deleting file here
-	call	quit
+	mov     esi, [ebx+4]        ; get the filename user typed (argv[2])
+
+    push    esi                 ; give the filename to file_exists
+    call    file_exists         ; check if the file exists
+    add     esp, 4              ; clean up the pushed argument from the stack
+
+    cmp     eax, 1              ; did file_exists return 1 (file found)?
+    jne     file_doesnt_exist   ; if file doesnt exist, show error and exit
+
+    mov     eax, 10             ; choose the delete-file syscall(sys_unlink)
+    mov     ebx, esi            ; give the syscall the filename to delete
+    int     80h                 ; ask kernel to delete file
+
+	call	quit                ; exit program successfully
 
 handle_help:
 	jmp		show_usage
@@ -118,5 +130,10 @@ wrong_arg_count:
 
 file_already_exists:
 	mov 	eax, err_file_exists
+	call	sprintLF
+	call	quit
+
+file_doesnt_exist:
+	mov 	eax, err_file_doesnt_exist
 	call	sprintLF
 	call	quit
