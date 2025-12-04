@@ -1,5 +1,8 @@
 %include	'functions.asm'		; include our functions file
 
+%define SYS_CREAT 8
+%define SYS_UNLINK 10
+
 SECTION .data
 flag_create	db "--create", 0
 flag_delete db "--delete", 0
@@ -81,9 +84,10 @@ handle_create:
     cmp     eax, 1              ; compare return value: is file already there?
 	je		file_already_exists
 
-    mov     eax, 8              ; syscall number 8 = sys_creat on 32-bit Linux
+	; execute syscall creat(char *pathname(ebx), umode_t mode(ecx))
+    mov     eax, SYS_CREAT      ; set eax to the create sycall opcode
     mov     ebx, esi            ; ebx = pointer to filename string
-    mov     ecx, 0777o          ; set file permissions (octal 0777)
+    mov     ecx, 0777o          ; set file permissions to read, write, and execute (octal 0777)
     int     80h                 ; ask kernel to create the file
 
     call 	quit                ; leave the program
@@ -102,7 +106,8 @@ handle_delete:
     cmp     eax, 1              ; did file_exists return 1 (file found)?
     jne     file_doesnt_exist   ; if file doesnt exist, show error and exit
 
-    mov     eax, 10             ; choose the delete-file syscall(sys_unlink)
+	; execute syscall unlink(int fd(ebx))
+    mov     eax, SYS_UNLINK 	; set eax to the delete syscall opcode
     mov     ebx, esi            ; give the syscall the filename to delete
     int     80h                 ; ask kernel to delete file
 
