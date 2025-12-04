@@ -47,24 +47,24 @@ check_flag:
     push    esi				  ; put user inputed flag on the stack
     call    strcmp			  ; compare them
     add     esp, 8			  ; clean stack frame of the previously pushed strings
-    test    eax, eax		  ; bitwise AND itself checks that strcmp returned 0 
-    jz      handle_create
+    cmp 	eax, 0			  ; check strcmp returned 0
+    jz      handle_create 	  ; if it is 0 jump to handle delete
 
     ; compare current argument with the "--delete" flag
     push    flag_delete		  ; put known flag on the stack
     push    esi				  ; put user inputed flag on the stack
     call    strcmp			  ; compare them
     add     esp, 8			  ; clean stack frame of the previously pushed strings
-    test    eax, eax		  ; bitwise AND itself checks that strcmp returned 0 
-    jz      handle_delete
+    cmp 	eax, 0			  ; check that strcmp returned 0 
+    jz      handle_delete	  ; if it is 0 jump to handle delete
 
     ; compare current argument with the "--help" flag
     push    flag_help		  ; put known flag on the stack
     push    esi				  ; put user inputed flag on the stack
     call    strcmp			  ; compare them
     add     esp, 8			  ; clean stack frame of the previously pushed strings
-    test    eax, eax          ; bitwise AND itself checks that strcmp returned 0
-    jz      handle_help
+    cmp 	eax, 0			  ; check that strcmp returned 0 
+    jz      handle_help		  ; if it is 0 jump to handle_help 
 
     ; if we reach this point the argument did not match any known flag.
 	jmp 	no_valid_flags
@@ -107,7 +107,7 @@ handle_delete:
     jne     file_doesnt_exist   ; if file doesnt exist, show error and exit
 
 	; execute syscall unlink(int fd(ebx))
-    mov     eax, SYS_UNLINK 	; set eax to the delete syscall opcode
+    mov     eax, SYS_UNLINK 	; 
     mov     ebx, esi            ; give the syscall the filename to delete
     int     80h                 ; ask kernel to delete file
 

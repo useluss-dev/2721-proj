@@ -54,7 +54,7 @@ sprint:
 ; string printing with line feed function
 sprintLF:
 	call    sprint 		; print original string
-    push    eax			; push eax to use string to use later
+    push    eax			; push eax to use string 
     mov     eax, 0Ah	; set eax to a '\n'
 
     push    eax			; pushes '\n' which is a single byte storing it as a full 32 bit value
@@ -87,7 +87,7 @@ strcmp:
     jne     .different      ; if they differ, jump to .different
 
     ; if characters are equal, check for end of string
-    test    al, al          ; check if al == '\0'
+    cmp		al, 0			; check if al == '\0'
     je      .equal          ; if al == '\0', then dl == '\0' so string are equal
 
     ; advance both pointers and continue
@@ -104,7 +104,7 @@ strcmp:
 
 .equal:
     ; strings matched all the way to the null terminator
-    xor     eax, eax        ; eax = 0
+    mov		eax, 0	; eax = 0
 
 .done:
     pop     edi             ; restore edi 
