@@ -40,27 +40,27 @@ check_flag:
     jz      no_valid_flags
 
     ; compare current argument with the "--create" flag
-    push    flag_create
-    push    esi
-    call    strcmp
-    add     esp, 8
-    test    eax, eax
+    push    flag_create		  ; put known flag on the stack
+    push    esi				  ; put user inputed flag on the stack
+    call    strcmp			  ; compare them
+    add     esp, 8			  ; clean stack frame of the previously pushed strings
+    test    eax, eax		  ; bitwise AND itself checks that strcmp returned 0 
     jz      handle_create
 
     ; compare current argument with the "--delete" flag
-    push    flag_delete
-    push    esi
-    call    strcmp
-    add     esp, 8
-    test    eax, eax
+    push    flag_delete		  ; put known flag on the stack
+    push    esi				  ; put user inputed flag on the stack
+    call    strcmp			  ; compare them
+    add     esp, 8			  ; clean stack frame of the previously pushed strings
+    test    eax, eax		  ; bitwise AND itself checks that strcmp returned 0 
     jz      handle_delete
 
     ; compare current argument with the "--help" flag
-    push    flag_help
-    push    esi
-    call    strcmp
-    add     esp, 8
-    test    eax, eax
+    push    flag_help		  ; put known flag on the stack
+    push    esi				  ; put user inputed flag on the stack
+    call    strcmp			  ; compare them
+    add     esp, 8			  ; clean stack frame of the previously pushed strings
+    test    eax, eax          ; bitwise AND itself checks that strcmp returned 0
     jz      handle_help
 
     ; if we reach this point the argument did not match any known flag.
